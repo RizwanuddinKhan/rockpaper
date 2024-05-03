@@ -1,0 +1,272 @@
+def caesar_cipher(text, shift):
+    encrypted_text = ""
+    for char in text:
+        if char.isalpha():
+            # Determine if the character is uppercase or lowercase
+            if char.isupper():
+                encrypted_text += chr((ord(char) - 65 + shift) % 26 + 65)
+            else:
+                encrypted_text += chr((ord(char) - 97 + shift) % 26 + 97)
+        else:
+            encrypted_text += char
+    return encrypted_text
+
+def caesar_decipher(text, shift):
+    return caesar_cipher(text, -shift)
+
+# Example usage:
+text = "Hello, World!"
+shift = 3
+encrypted_text = caesar_cipher(text, shift)
+print("Encrypted text:", encrypted_text)
+decrypted_text = caesar_decipher(encrypted_text, shift)
+print("Decrypted text:", decrypted_text)
+
+
+
+------------------------------------------------------------------------------------------
+
+def encrypt_rail_fence(text, rails):
+    fence = [['' for _ in range(len(text))] for _ in range(rails)]
+    rail = 0
+    direction = 1
+
+    for char in text:
+        fence[rail][0] += char
+        if rail == 0:
+            direction = 1
+        elif rail == rails - 1:
+            direction = -1
+        rail += direction
+
+    cipher_text = ''.join([''.join(row) for row in fence])
+    return cipher_text
+
+def decrypt_rail_fence(cipher_text, rails):
+    fence = [['' for _ in range(len(cipher_text))] for _ in range(rails)]
+    rail = 0
+    direction = 1
+
+    for char in cipher_text:
+        fence[rail][0] += 'X'
+        if rail == 0:
+            direction = 1
+        elif rail == rails - 1:
+            direction = -1
+        rail += direction
+
+    idx = 0
+    for i in range(rails):
+        for j in range(len(cipher_text)):
+            if fence[i][j] == 'X' and idx < len(cipher_text):
+                fence[i][j] = cipher_text[idx]
+                idx += 1
+
+    plain_text = ''
+    rail = 0
+    direction = 1
+    for _ in range(len(cipher_text)):
+        plain_text += fence[rail][0]
+        if rail == 0:
+            direction = 1
+        elif rail == rails - 1:
+            direction = -1
+        rail += direction
+
+    return plain_text
+
+# Example usage:
+text = "Hello, World!"
+rails = 3
+
+encrypted_text = encrypt_rail_fence(text, rails)
+print("Encrypted:", encrypted_text)
+
+decrypted_text = decrypt_rail_fence(encrypted_text, rails)
+print("Decrypted:", decrypted_text)
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+def generate_key(text, key):
+    key = list(key)
+    if len(text) == len(key):
+        return key
+    else:
+        for i in range(len(text) - len(key)):
+            key.append(key[i % len(key)])
+    return "".join(key)
+
+def vigenere_encrypt(text, key):
+    encrypted_text = ""
+    for i in range(len(text)):
+        if text[i].isalpha():
+            shift = (ord(key[i]) - ord('A')) % 26
+            if text[i].isupper():
+                encrypted_text += chr((ord(text[i]) + shift - 65) % 26 + 65)
+            else:
+                encrypted_text += chr((ord(text[i]) + shift - 97) % 26 + 97)
+        else:
+            encrypted_text += text[i]
+    return encrypted_text
+
+def vigenere_decrypt(text, key):
+    decrypted_text = ""
+    for i in range(len(text)):
+        if text[i].isalpha():
+            shift = (ord(key[i]) - ord('A')) % 26
+            if text[i].isupper():
+                decrypted_text += chr((ord(text[i]) - shift - 65) % 26 + 65)
+            else:
+                decrypted_text += chr((ord(text[i]) - shift - 97) % 26 + 97)
+        else:
+            decrypted_text += text[i]
+    return decrypted_text
+
+# Example usage:
+text = "HELLO"
+key = "KEY"
+key = generate_key(text, key)
+
+encrypted_text = vigenere_encrypt(text, key)
+print("Encrypted:", encrypted_text)
+
+decrypted_text = vigenere_decrypt(encrypted_text, key)
+print("Decrypted:", decrypted_text)
+
+
+-------------------------------------------------------Diffie Hellman -----------------------------------------------------------------------------------
+import random
+
+def mod_exp(base, exponent, modulus):
+    result = 1
+    base = base % modulus
+    while exponent > 0:
+        if exponent % 2 == 1:
+            result = (result * base) % modulus
+        exponent = exponent // 2
+        base = (base * base) % modulus
+    return result
+
+def generate_key(prime, primitive_root):
+    private_key = random.randint(2, prime - 1)
+    public_key = mod_exp(primitive_root, private_key, prime)
+    return private_key, public_key
+
+def compute_shared_secret(private_key, other_party_public_key, prime):
+    shared_secret = mod_exp(other_party_public_key, private_key, prime)
+    return shared_secret
+
+# Example usage:
+prime = 23
+primitive_root = 5
+
+alice_private_key, alice_public_key = generate_key(prime, primitive_root)
+bob_private_key, bob_public_key = generate_key(prime, primitive_root)
+
+shared_secret_alice = compute_shared_secret(alice_private_key, bob_public_key, prime)
+shared_secret_bob = compute_shared_secret(bob_private_key, alice_public_key, prime)
+
+print("Shared secret computed by Alice:", shared_secret_alice)
+print("Shared secret computed by Bob:", shared_secret_bob)
+
+
+
+
+------------------------------------------------------------playfair---------------------------------------------------------------------------------
+
+
+
+
+def prepare_input(text):
+    # Make sure the text is all uppercase and remove non-alphabetic characters
+    text = text.upper().replace("J", "I")
+    text = "".join(filter(str.isalpha, text))
+    return text
+
+def generate_table(key):
+    # Generate a 5x5 grid using the given key
+    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"  # excluding J
+    key = prepare_input(key)
+    key = key + alphabet
+    table = []
+
+    for char in key:
+        if char not in table:
+            table.append(char)
+
+    # Convert the table list into a 5x5 grid
+    table_grid = [table[i:i + 5] for i in range(0, 25, 5)]
+    return table_grid
+
+def get_coordinates(table, char):
+    # Get the coordinates of a character in the table grid
+    for i, row in enumerate(table):
+        for j, val in enumerate(row):
+            if val == char:
+                return i, j
+
+def encrypt(plaintext, key):
+    table = generate_table(key)
+    plaintext = prepare_input(plaintext)
+    ciphertext = ""
+    for i in range(0, len(plaintext), 2):
+        pair1 = plaintext[i]
+        pair2 = plaintext[i + 1] if i + 1 < len(plaintext) else 'X'
+        x1, y1 = get_coordinates(table, pair1)
+        x2, y2 = get_coordinates(table, pair2)
+
+        # Same row
+        if x1 == x2:
+            ciphertext += table[x1][(y1 + 1) % 5]
+            ciphertext += table[x2][(y2 + 1) % 5]
+        # Same column
+        elif y1 == y2:
+            ciphertext += table[(x1 + 1) % 5][y1]
+            ciphertext += table[(x2 + 1) % 5][y2]
+        # Forming a rectangle
+        else:
+            ciphertext += table[x1][y2]
+            ciphertext += table[x2][y1]
+
+    return ciphertext
+
+def decrypt(ciphertext, key):
+    table = generate_table(key)
+    plaintext = ""
+    for i in range(0, len(ciphertext), 2):
+        pair1 = ciphertext[i]
+        pair2 = ciphertext[i + 1]
+        x1, y1 = get_coordinates(table, pair1)
+        x2, y2 = get_coordinates(table, pair2)
+
+        # Same row
+        if x1 == x2:
+            plaintext += table[x1][(y1 - 1) % 5]
+            plaintext += table[x2][(y2 - 1) % 5]
+        # Same column
+        elif y1 == y2:
+            plaintext += table[(x1 - 1) % 5][y1]
+            plaintext += table[(x2 - 1) % 5][y2]
+        # Forming a rectangle
+        else:
+            plaintext += table[x1][y2]
+            plaintext += table[x2][y1]
+
+    return plaintext
+
+# Example usage:
+plaintext = "HELLO"
+key = "KEYWORD"
+
+encrypted_text = encrypt(plaintext, key)
+print("Encrypted:", encrypted_text)
+
+decrypted_text = decrypt(encrypted_text, key)
+print("Decrypted:", decrypted_text)
+
+
+
