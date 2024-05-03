@@ -1,0 +1,193 @@
+function caesarCipherEncrypt(plainText, shift):
+    cipherText = ""
+    for each character in plainText:
+        if character is a letter:
+            if character is uppercase:
+                encryptedChar = (character + shift - 'A') mod 26 + 'A'
+            else:
+                encryptedChar = (character + shift - 'a') mod 26 + 'a'
+        else:
+            encryptedChar = character
+        cipherText += encryptedChar
+    return cipherText
+
+====================================================================
+
+function caesarCipherDecrypt(cipherText, shift):
+    plainText = ""
+    for each character in cipherText:
+        if character is a letter:
+            if character is uppercase:
+                decryptedChar = (character - shift - 'A' + 26) mod 26 + 'A'
+            else:
+                decryptedChar = (character - shift - 'a' + 26) mod 26 + 'a'
+        else:
+            decryptedChar = character
+        plainText += decryptedChar
+    return plainText
+
+
+
+
+--------------------------------------------------------------------------------------------
+Encryption-------------------------------------------------------------------------------------------------------------------->
+
+1. Initialize: Create an empty matrix called "rail" with dimensions `key x len(text)`.
+
+2. Setup Variables: Set `row` to 0 and `step` to 1.
+
+3. Iterate Through Text: For each character `char` in the input text:
+    - Append `char` to the current row of the rail matrix.
+    - If `row` is at the top or bottom edge of the rail, reverse the direction (`step`).
+    - Update `row` based on the direction (`step`).
+
+4. Concatenate Characters: Concatenate the characters row by row to form the encrypted text.
+
+5. Return Encrypted Text: Return the concatenated text as the result
+
+
+
+
+
+
+---------------------------------------------------------------------------Decryption-------------------------------------------------------------->
+
+Function decrypt(ciphertext, key):
+    # Step 1: Generate the key table
+    key_table = generate_key_table(key)
+    
+    # Step 2: Decrypt the ciphertext
+    plaintext = ""
+    for each pair of characters in ciphertext:
+        # Step 2.1: Find the positions of the characters in the key table
+        Get positions (row1, col1) and (row2, col2) of the characters
+        
+        # Step 2.2: Handle characters in the same row
+        if characters are in the same row:
+            Replace each character with the character to its left (modulo 5)
+        
+        # Step 2.3: Handle characters in the same column
+        else if characters are in the same column:
+            Replace each character with the character above it (modulo 5)
+        
+        # Step 2.4: Handle characters in different rows and columns
+        else:
+            Replace each character with the character at the intersection of the other character's row
+        
+        # Step 2.5: Append the decrypted characters to the plaintext
+    
+    # Step 3: Return the plaintext
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+function playfairEncrypt(plainText, key):
+    prepareKey(key)
+    preparePlainText(plainText)
+    cipherText = ""
+
+    for each pair of plaintext characters:
+        find position of each character in the key square
+        if both characters are in the same row:
+            take characters to the right, wrapping around if needed
+        else if both characters are in the same column:
+            take characters below, wrapping around if needed
+        else:
+            form a rectangle and take the characters in the opposite corners
+
+        add resulting characters to the ciphertext
+
+    return cipherText
+
+===================================================================
+
+function playfairDecrypt(cipherText, key):
+    keyMatrix = generateKeyMatrix(key)
+    pairs = splitCipherTextIntoPairs(cipherText)
+    plainText = ""
+
+    for each pair in pairs:
+        decryptedPair = decryptPair(pair, keyMatrix)
+        plainText += decryptedPair
+
+    return plainText
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+1. Define the Function:
+   - Create a function named `vignere` that takes three parameters: `text`, `key`, and `mode`.
+
+2. Standardize Input:
+   - Convert both `text` and `key` to uppercase to ensure case uniformity.
+
+3. Initialize Variables:
+   - Start with an empty string `output` to hold the result.
+
+4. Loop Through Text:
+   - Iterate over each character in `text`, using index `i` to access each character.
+
+5. Check Mode:
+   - If `mode` is `"e"` (encryption):
+     - Calculate `k` as the ASCII value of the key character corresponding to the current text character minus 65 (ASCII for 'A').
+     - Compute the encrypted character using `(ord(text[i]) + k) % 26 + 65` to cycle within alphabet boundaries.
+     - Convert the resulting ASCII value back to a character and append it to `output`.
+   - If `mode` is `"d"` (decryption):
+     - Calculate `k` similarly to encryption.
+     - Compute the decrypted character using `(ord(text[i]) - k + 26) % 26 + 65` to handle potential negative values correctly.
+     - Convert this value back to a character and append it to `output`.
+
+6. Return or Error Handling:
+   - If the mode is neither `"e"` nor `"d"`, return a message indicating an invalid mode.
+
+7. Output the Result:
+   - Return the `output` string which now contains either the encrypted or decrypted text.
+
+8. Get User Input:
+   - Outside the function, prompt the user to input the `plaintext`, `key`, and `mode` ('e' for encryption, 'd' for decryption).
+
+9. Execute Function Based on Mode:
+   - If the user enters `"e"`, call the `vignere` function with mode `"e"` to encrypt.
+   - If `"d"` is entered, call the function with mode `"d"` to decrypt.
+   - Print the resulting `Encrypted Text` or `Decrypted Text`.
+
+10. Error Handling in Input:
+    - If an invalid mode is entered, print an error message.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+Begin
+    Define public prime number Ps and base Gs
+    Set Ps to 23
+    Set Gs to 9
+    
+    Display "Value of Ps is : Ps"
+    Display "Value of Gs is : Gs"
+    
+    Define private key g for Joy
+    Set g to 4
+    Display "Private Key g is: g"
+    
+    Compute the public key p for Joy using the formula p = Gs^g mod Ps
+    Display p
+    
+    Define private key h for Happy
+    Set h to 3
+    Display "Private Key h is : h"
+    
+    Compute the public key q for Happy using the formula q = Gs^h mod Ps
+    Display q
+    
+    Compute Joy's secret key K_A using Happy's public key:
+    Set K_A to q^g mod Ps
+    Display "Joy's Secret key is : K_A"
+    
+    Compute Happy's secret key K_B using Joy's public key:
+    Set K_B to p^h mod Ps
+    Display "Happy's Secret key is : K_B"
+    
+    Verify that both secret keys are equal (K_A == K_B)
+End
